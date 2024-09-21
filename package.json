@@ -1,0 +1,17 @@
+{
+  "name": "type-parser-tree",
+  "module": "index.ts",
+  "type": "module",
+  "devDependencies": {
+    "@types/bun": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "ts-morph": "^22.0.0",
+    "ts-types-parser": "^1.0.3",
+    "typescript": "^5.4.5",
+    "typescript-parser": "^2.6.1"
+  }
+}
