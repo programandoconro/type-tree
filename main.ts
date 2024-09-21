@@ -7,6 +7,8 @@ const sourceFile = project.addSourceFileAtPath("./ts-to-compile.ts");
 const primitives = ["string", undefined, "boolean", "number"];
 const result: Result = {};
 
+console.log(sourceFile.getText());
+
 sourceFile.getTypeAliases().forEach(recursion);
 
 console.log({ result });
@@ -16,24 +18,33 @@ function recursion(typeAlias: TypeAliasDeclaration) {
   const node = typeAlias?.getTypeNode();
   const text = node?.getText();
   const nodeType = node?.getType();
-  const isArray = nodeType?.isArray();
   const isLiteralNumber = nodeType?.isNumberLiteral();
   const isLiteralString = nodeType?.isStringLiteral();
 
   if (primitives.includes(text) || isLiteralString || isLiteralNumber) {
     result[name] = text;
   } else {
-    if (isArray) {
-      const arrayType = nodeType?.getArrayElementType();
-      console.log(arrayType?.isObject());
-    }
-    console.log(`${name}: ${text}`);
+    handleNotPrimitiveTypes(nodeType, name);
   }
 }
 
-function handleNotPrimitiveTypes(t: Type) {
+function handleNotPrimitiveTypes(t: Type | undefined, name: string) {
+  if (typeof t === "undefined") {
+    result[name] = undefined;
+    return;
+  }
   if (t.isArray()) {
     console.log("Array");
+    const arrayType = t?.getArrayElementType();
+    const innerText = arrayType?.getText();
+    if (primitives.includes(innerText)) {
+      result[name] = innerText + "[]";
+    } else {
+      handleNotPrimitiveTypes(arrayType, name);
+      console.log("recursion", {
+        arrayType: arrayType?.getProperties().map((p) => p.getName()),
+      });
+    }
     return;
   }
   if (t.isObject()) {
