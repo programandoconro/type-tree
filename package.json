@@ -1,5 +1,5 @@
 {
-  "name": "type-parser-tree",
+  "name": "type-tree",
   "module": "index.ts",
   "type": "module",
   "devDependencies": {
@@ -15,3 +15,4 @@
     "typescript-parser": "^2.6.1"
   }
 }
+
