@@ -8,6 +8,6 @@ type Bool = boolean;
 
 type Topo = "topo";
 
-type OtherType = { a: "hol"; b: AnotherType };
-
 type Recordo = Record<string, OtherType>;
+
+type OtherType = { a: "hol"; b: AnotherType };
