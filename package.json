@@ -2,6 +2,11 @@
   "name": "type-tree",
   "module": "index.ts",
   "type": "module",
+  "scripts": {
+    "start": "bun run index.ts",
+    "dev": "bun --watch index.ts",
+    "test": "bun --watch test __test/index.test.ts"
+  },
   "devDependencies": {
     "@types/bun": "latest"
   },
@@ -15,4 +20,3 @@
     "typescript-parser": "^2.6.1"
   }
 }
-
