@@ -1,9 +1,26 @@
 import { expect, it, test } from "bun:test";
-import { createSourceFile, handleTypes, type Result } from "..";
+import { handleTypes, type Result } from "..";
+import { Project } from "ts-morph";
 
 test("handle primitives", () => {
-  const fileNameOrPath = "./__test/primitives.ts";
-  const sourceFile = createSourceFile(fileNameOrPath);
+  const project = new Project();
+  const sourceFile = project.createSourceFile(
+    "temp.ts",
+    `
+    type S = string;
+    type LiteralS = "hello";
+
+    type N = number;
+    type LiteralN = 123;
+
+    type B = boolean;
+    type T = true;
+    type F = false;
+
+    type U = undefined;
+     
+    `,
+  );
 
   const result: Result = {};
   sourceFile
@@ -22,8 +39,15 @@ test("handle primitives", () => {
 });
 
 test("handle simple array", () => {
-  const fileNameOrPath = "./__test/simple_array.ts";
-  const sourceFile = createSourceFile(fileNameOrPath);
+  const project = new Project();
+  const sourceFile = project.createSourceFile(
+    "temp.ts",
+    `
+      type Arr = string[];
+      type LiteralA = ["hola", "hello", true, 123]
+     
+    `,
+  );
 
   const result: Result = {};
   sourceFile
@@ -42,8 +66,14 @@ test("handle simple array", () => {
 });
 
 test("handle simple object", () => {
-  const fileNameOrPath = "./__test/simple_object.ts";
-  const sourceFile = createSourceFile(fileNameOrPath);
+  const project = new Project();
+  const sourceFile = project.createSourceFile(
+    "temp.ts",
+    `
+      type Obj = { a: "hello"; b: 123 };
+     
+    `,
+  );
 
   const result: Result = {};
   sourceFile
@@ -56,8 +86,25 @@ test("handle simple object", () => {
 });
 
 test("handle complex object", () => {
-  const fileNameOrPath = "./__test/complex_object.ts";
-  const sourceFile = createSourceFile(fileNameOrPath);
+  const project = new Project();
+  const sourceFile = project.createSourceFile(
+    "temp.ts",
+    `
+      type Obj = {
+        a: "hello";
+        b: NestedType;
+      };
+
+      interface NestedType {
+        c: true;
+        d: boolean;
+        e: MyRecord;
+      }
+      
+      type MyRecord = Record<string, boolean>;
+
+`,
+  );
 
   const result: Result = {};
   sourceFile
@@ -70,11 +117,28 @@ test("handle complex object", () => {
       b: {
         c: "true",
         d: "boolean",
+        e: "Record<string, boolean>",
       },
     },
     NestedType: {
       c: "true",
       d: "boolean",
+      e: "Record<string, boolean>",
     },
+    MyRecord: "Record<string, boolean>",
   });
+});
+test("handle Records", () => {
+  const project = new Project();
+  const sourceFile = project.createSourceFile(
+    "temp.ts",
+    `
+      type MyRecord = Record<string, number>;
+`,
+  );
+  const result: Result = {};
+  sourceFile
+    ?.getTypeAliases()
+    .forEach((typeAlias) => handleTypes(typeAlias, result));
+  expect(result).toStrictEqual({ MyRecord: "Record<string, number>" });
 });
