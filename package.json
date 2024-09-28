@@ -5,6 +5,7 @@
   "scripts": {
     "start": "bun run index.ts",
     "dev": "bun --watch index.ts",
+    "prettier": "npx prettier . --write",
     "test": "bun --watch test __test/index.test.ts"
   },
   "devDependencies": {

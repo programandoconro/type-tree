@@ -77,10 +77,14 @@ function handleNotPrimitive(
 
   if (t.isTuple()) {
     console.log("Tuple");
+    if (!result[name]?.length) {
+      result[name] = [];
+    }
     t.getTupleElements().map((ele, index) => {
       const innerType = ele;
       if (isPrimitive(innerType)) {
-        result[name] = { ...result[name], [index]: ele.getText() };
+        result[name].push(ele.getText());
+        // result[name] = { ...result[name], [index]: ele.getText() };
       }
     });
     return result;
