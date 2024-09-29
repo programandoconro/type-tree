@@ -1,25 +1,10 @@
-import { Project, SourceFile, Type, TypeAliasDeclaration } from "ts-morph";
+import { Project, Type } from "ts-morph";
 
-export type Result = Record<string, any>;
+const FILE_PATH = "./ts-to-compile.ts"; // TODO: handle input file
+createTypeTree(FILE_PATH);
 
-const FILE_PATH = "./ts-to-compile.ts";
-
-export function addSourceFileAtPath(filePath: string): SourceFile {
-  const project = new Project({});
-  return project.addSourceFileAtPath(filePath);
-}
-
-function isPrimitive(nodeType?: Type): boolean {
-  const isString = nodeType?.isString() || nodeType?.isStringLiteral();
-  const isBoolean = nodeType?.isBoolean() || nodeType?.isBooleanLiteral();
-  const isNumber = nodeType?.isNumber() || nodeType?.isNumberLiteral();
-  const isNullish = nodeType?.isNullable();
-
-  return Boolean(isNumber || isString || isBoolean || isNullish);
-}
-
-type Props = { filePath: string; testCode?: string };
-export function createTypeTree({ filePath, testCode }: Props) {
+type Result = Record<string, unknown>;
+export function createTypeTree(filePath: string, testCode?: string): Result {
   const result: Result = {};
   const project = new Project({});
   const sourceFile = !testCode
@@ -38,17 +23,65 @@ export function createTypeTree({ filePath, testCode }: Props) {
   return result;
 }
 
-createTypeTree({ filePath: FILE_PATH });
+function handleTypes(t?: Type) {
+  return isPrimitive(t) ? handlePrimitive(t) : handleNotPrimitive(t);
+}
 
-export function handleTypes(t?: Type) {
-  if (isPrimitive(t)) {
-    return handlePrimitive(t);
-  } else {
-    return handleNotPrimitive(t);
+function isPrimitive(t?: Type): boolean {
+  const isString = t?.isString() || t?.isStringLiteral();
+  const isBoolean = t?.isBoolean() || t?.isBooleanLiteral();
+  const isNumber = t?.isNumber() || t?.isNumberLiteral();
+  const isNullish = t?.isNullable();
+
+  return Boolean(isNumber || isString || isBoolean || isNullish);
+}
+
+function handlePrimitive(t?: Type) {
+  switch (true) {
+    case t?.isNumberLiteral(): {
+      return Number(t?.getText());
+    }
+    case t?.isBooleanLiteral(): {
+      return t?.getText() === "true";
+    }
+    default: {
+      return t?.getText();
+    }
   }
 }
 
-function handleArray(t?: Type) {
+function handleNotPrimitive(t?: Type) {
+  if (typeof t === "undefined") {
+    return undefined;
+  }
+
+  if (t.isTuple()) {
+    console.log("Tuple");
+    const tuple: unknown[] = [];
+    t.getTupleElements().map((ele) => {
+      if (isPrimitive(ele)) {
+        tuple.push(handlePrimitive(ele));
+      } else {
+        return handleNotPrimitive(ele);
+      }
+    });
+    return tuple;
+  }
+
+  if (t.isArray()) {
+    return handleArray(t);
+  }
+  if (t.isObject()) {
+    const record = handleRecord(t);
+
+    if (record.isRecord) {
+      return record.record;
+    }
+    return handleObject(t);
+  }
+}
+
+function handleArray(t?: Type): string | unknown[] {
   console.log("Array");
   const arrayType = t?.getArrayElementType();
   const innerText = arrayType?.getText();
@@ -56,13 +89,12 @@ function handleArray(t?: Type) {
   if (isPrimitive(arrayType)) {
     return innerText + "[]";
   } else {
-    const arr: unknown[] = [];
-    // TODO: handle not primitive
-    return arr;
+    return [handleNotPrimitive(arrayType)];
   }
 }
 
 function handleRecord(t: Type) {
+  console.log("Record");
   const symbolDeclarations = t.getAliasSymbol()?.getDeclarations();
   const record = symbolDeclarations?.[0]
     ?.getText()
@@ -76,49 +108,8 @@ function handleRecord(t: Type) {
   };
 }
 
-function handlePrimitive(t?: Type) {
-  const text = t?.getText();
-  return text;
-}
-
-function handleNotPrimitive(t: Type | undefined) {
-  if (typeof t === "undefined") {
-    console.log(undefined);
-    return undefined;
-  }
-
-  if (t.isTuple()) {
-    console.log("Tuple");
-    const tuple: unknown[] = [];
-    t.getTupleElements().map((ele) => {
-      const innerType = ele;
-      if (isPrimitive(innerType)) {
-        tuple.push(ele.getText());
-      } else {
-        return handleNotPrimitive(ele);
-      }
-    });
-    return tuple;
-  }
-
-  if (t.isArray()) {
-    console.log("Array");
-    return handleArray(t);
-  }
-  if (t.isObject()) {
-    const record = handleRecord(t);
-
-    if (record.isRecord) {
-      console.log("Record");
-      return record.record;
-    } else {
-      return handleObject(t);
-    }
-  }
-}
-
 function handleObject(t?: Type) {
-  console.log("Object", t?.isInterface(), t?.getText());
+  console.log("Object");
 
   const obj: Record<string, unknown> = {};
   t?.getProperties().forEach((prop) => {
@@ -126,11 +117,9 @@ function handleObject(t?: Type) {
     const innerDeclaration = prop.getDeclarations();
     innerDeclaration.forEach((p) => {
       const innerType = p.getType();
-      if (isPrimitive(innerType)) {
-        obj[name] = handlePrimitive(innerType);
-      } else {
-        obj[name] = handleNotPrimitive(innerType);
-      }
+      obj[name] = isPrimitive(innerType)
+        ? handlePrimitive(innerType)
+        : handleNotPrimitive(innerType);
     });
   });
   return obj;

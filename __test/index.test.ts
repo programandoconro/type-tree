@@ -1,4 +1,4 @@
-import { expect, it, test } from "bun:test";
+import { expect, test } from "bun:test";
 import { createTypeTree } from "..";
 import { Project } from "ts-morph";
 
@@ -14,20 +14,20 @@ test("handle primitives", () => {
     type T = true;
     type F = false;
 
-    // type U = undefined;
+    type U = undefined;
      
     `;
-  const result = createTypeTree({ filePath: "temp.ts", testCode: sourceCode });
+  const result = createTypeTree("temp.ts", sourceCode);
 
   expect(result).toStrictEqual({
     S: "string",
     LiteralS: '"hello"',
     N: "number",
-    LiteralN: "123",
+    LiteralN: 123,
     B: "boolean",
-    T: "true",
-    F: "false",
-    // U: undefined
+    T: true,
+    F: false,
+    U: undefined,
   });
 });
 
@@ -38,11 +38,40 @@ test("handle simple array", () => {
      
     `;
 
-  const result = createTypeTree({ filePath: "temp.ts", testCode: sourceCode });
+  const result = createTypeTree("temp.ts", sourceCode);
 
   expect(result).toStrictEqual({
     Arr: "string[]",
-    LiteralA: ['"hola"', '"hello"', "true", "123"],
+    LiteralA: ['"hola"', '"hello"', true, 123],
+  });
+});
+
+test("handle complex array", () => {
+  const sourceCode = `
+      type B = boolean;
+      type Obj = {a: {a: "hola", b: B}};
+      type Arr = Obj[];
+     
+    `;
+
+  const result = createTypeTree("temp.ts", sourceCode);
+
+  expect(result).toStrictEqual({
+    B: "boolean",
+    Obj: {
+      a: {
+        a: '"hola"',
+        b: "boolean",
+      },
+    },
+    Arr: [
+      {
+        a: {
+          a: '"hola"',
+          b: "boolean",
+        },
+      },
+    ],
   });
 });
 
@@ -53,11 +82,11 @@ test("handle simple object", () => {
      
     `;
 
-  const result = createTypeTree({ filePath: "temp.ts", testCode: sourceCode });
+  const result = createTypeTree("temp.ts", sourceCode);
 
   expect(result).toStrictEqual({
-    Obj: { a: '"hello"', b: "123" },
-    Obj2: { a: '"hola"', b: "true" },
+    Obj: { a: '"hello"', b: 123 },
+    Obj2: { a: '"hola"', b: true },
   });
 });
 
@@ -78,19 +107,19 @@ test("handle complex object", () => {
 
 `;
 
-  const result = createTypeTree({ filePath: "temp.ts", testCode: sourceCode });
+  const result = createTypeTree("temp.ts", sourceCode);
 
   expect(result).toStrictEqual({
     Obj: {
       a: '"hello"',
       b: {
-        c: "true",
+        c: true,
         d: "boolean",
         e: "Record<string, boolean>",
       },
     },
     NestedType: {
-      c: "true",
+      c: true,
       d: "boolean",
       e: "Record<string, boolean>",
     },
@@ -102,6 +131,6 @@ test("handle Records", () => {
   const sourceCode = `
       type MyRecord = Record<string, number>;
 `;
-  const result = createTypeTree({ filePath: "temp.ts", testCode: sourceCode });
+  const result = createTypeTree("temp.ts", sourceCode);
   expect(result).toStrictEqual({ MyRecord: "Record<string, number>" });
 });
