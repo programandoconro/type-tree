@@ -26,26 +26,24 @@ function createTypeTree(filePath: string) {
 
   sourceFile
     .getTypeAliases()
-    .forEach((typeAlias) =>{
-      const name = typeAlias.getName()
-      result[name] = handleTypes(typeAlias);
-
-    }) 
+    .forEach((typeAlias) => handleTypes(typeAlias, result));
 
   console.log({ result, resultStringify: JSON.stringify(result) });
 }
 
 createTypeTree(FILE_PATH);
 
-export function handleTypes(typeAlias: TypeAliasDeclaration) {
+export function handleTypes(typeAlias: TypeAliasDeclaration, result: Result) {
+  const name = typeAlias.getName();
   const node = typeAlias?.getTypeNode();
-  const t = node?.getType();
-  if (isPrimitive(t)) {
-   return handlePrimitive(t);
+  const nodeType = node?.getType();
+  if (isPrimitive(nodeType)) {
+   return handlePrimitive(typeAlias);
   } else {
     
-   return handleNotPrimitive(t);
+   return handleNotPrimitive(nodeType, name, result);
   }
+  return result;
 }
 
 function handleArray(t?: Type) {
@@ -57,20 +55,23 @@ function handleArray(t?: Type) {
     if (isPrimitive(arrayType)) {
       return innerText + "[]";
     } else {
-      const arr:unknown[] = []
-      // TODO: handle not primitive
-      return arr; 
+      //  handleNotPrimitiveTypes(arrayType, name, result);
+      arrayType?.getProperties().forEach((p) => {
+        const value = p.getValueDeclaration()?.getType();
+        const name = p.getName();
+       // handleNotPrimitive(value, name, result);
+      });
     }
 
 }
 
-function handleRecord(t: Type) {
+function getRecord(t: Type) {
   const symbolDeclarations = t.getAliasSymbol()?.getDeclarations();
   const record = symbolDeclarations?.[0]
     ?.getText()
-    .split("=")?.[1]
-    ?.replace(" ", "")
-    ?.replace(";", "");
+    .split("=")[1]
+    .replace(" ", "")
+    .replace(";", "");
 
   return {
     isRecord: symbolDeclarations?.length === 1 && record?.includes("Record<"),
@@ -78,8 +79,9 @@ function handleRecord(t: Type) {
   };
 }
 
-function handlePrimitive(t?: Type) {
-  const text = t?.getText();
+function handlePrimitive(typeAlias: TypeAliasDeclaration) {
+  const node = typeAlias?.getTypeNode();
+  const text = node?.getText();
   return text;
 }
 
@@ -98,6 +100,7 @@ function handleNotPrimitive(
       const innerType = ele;
       if (isPrimitive(innerType)) {
         tuple.push(ele.getText());
+        // result[name] = { ...result[name], [index]: ele.getText() };
       }
 
       else{
@@ -113,36 +116,35 @@ function handleNotPrimitive(
 
   }
   if (t.isObject()) {
+    console.log("Object");
 
-    const record = handleRecord(t);
+    const record = getRecord(t);
 
+    const upperName = t.getText();
     if (record.isRecord) {
       console.log("Record");
-      return record.record;
+    //  result[upperName] = record.record;
+     // return result;
     }
 
-    else {
-      return  handleObject(t)
-    }
-
-  }
-}
-
-function handleObject(t?: Type) {
-   console.log("Object", t?.isInterface());
-   const obj: Record<string, unknown> = {};
-   t?.getProperties().forEach((prop) => {
-      const name = prop?.getName()
-      const innerDeclaration = prop.getDeclarations();
-     innerDeclaration.forEach((p) => {
+    t?.getProperties().forEach((p) => {
+      const innerDeclaration = p.getDeclarations();
+      const name = p.getName();
+      innerDeclaration.map((p) => {
         const innerType = p.getType();
+        const value = innerType.getText();
         if (isPrimitive(innerType)) {
-          obj[name]= handlePrimitive(innerType);
+         // result[upperName] = { ...result[upperName], [name]: value };
         } else {
-          obj[name] = handleNotPrimitive(innerType);
+        return  handleNotPrimitive(innerType);
+       //   result[upperName] = {
+        //    ...result[upperName],
+         //   [name]: result[innerType.getText()],
+  //        };
         }
       });
+     // return result;
     });
-  return obj
-
+  }
+ // return result;
 }

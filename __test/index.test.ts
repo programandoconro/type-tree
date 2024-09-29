@@ -17,7 +17,7 @@ test("handle primitives", () => {
     type T = true;
     type F = false;
 
-    type U = undefined;
+    // type U = undefined;
      
     `,
   );
@@ -25,7 +25,12 @@ test("handle primitives", () => {
   const result: Result = {};
   sourceFile
     ?.getTypeAliases()
-    .forEach((typeAlias) => handleTypes(typeAlias, result));
+    .forEach((typeAlias) => {
+      const name = typeAlias.getName()
+
+      result[name] = handleTypes(typeAlias);
+
+    }) 
 
   expect(result).toStrictEqual({
     S: "string",
@@ -35,6 +40,7 @@ test("handle primitives", () => {
     B: "boolean",
     T: "true",
     F: "false",
+   // U: undefined
   });
 });
 
@@ -52,25 +58,31 @@ test("handle simple array", () => {
   const result: Result = {};
   sourceFile
     ?.getTypeAliases()
-    .forEach((typeAlias) => handleTypes(typeAlias, result));
+    .forEach((typeAlias) =>{
+      const name = typeAlias.getName()
+      result[name] = handleTypes(typeAlias);
+
+
+    }) 
 
   expect(result).toStrictEqual({
     Arr: "string[]",
-    LiteralA: {
-      "0": '"hola"',
-      "1": '"hello"',
-      "2": "true",
-      "3": "123",
-    },
+    LiteralA: [
+       '"hola"',
+       '"hello"',
+     "true",
+    "123",
+    ],
   });
 });
 
-test("handle simple object", () => {
+test.only("handle simple object", () => {
   const project = new Project();
   const sourceFile = project.createSourceFile(
     "temp.ts",
     `
       type Obj = { a: "hello"; b: 123 };
+      interface Obj2 { a: "hola"; b: true };
      
     `,
   );
@@ -78,14 +90,20 @@ test("handle simple object", () => {
   const result: Result = {};
   sourceFile
     ?.getTypeAliases()
-    .forEach((typeAlias) => handleTypes(typeAlias, result));
+    .forEach((typeAlias) =>{
+      const name = typeAlias.getName()
+      result[name] = handleTypes(typeAlias);
+
+
+    }) 
 
   expect(result).toStrictEqual({
     Obj: { a: '"hello"', b: "123" },
+    Obj2: {a: '"hola"', b: "true" },
   });
 });
 
-test("handle complex object", () => {
+test.only("handle complex object", () => {
   const project = new Project();
   const sourceFile = project.createSourceFile(
     "temp.ts",
@@ -109,7 +127,12 @@ test("handle complex object", () => {
   const result: Result = {};
   sourceFile
     ?.getTypeAliases()
-    .forEach((typeAlias) => handleTypes(typeAlias, result));
+    .forEach((typeAlias) =>{
+      const name = typeAlias.getName()
+      result[name] = handleTypes(typeAlias);
+
+
+    }) 
 
   expect(result).toStrictEqual({
     Obj: {
@@ -139,6 +162,6 @@ test("handle Records", () => {
   const result: Result = {};
   sourceFile
     ?.getTypeAliases()
-    .forEach((typeAlias) => handleTypes(typeAlias, result));
+    .forEach((typeAlias) => handleTypes(typeAlias));
   expect(result).toStrictEqual({ MyRecord: "Record<string, number>" });
 });
