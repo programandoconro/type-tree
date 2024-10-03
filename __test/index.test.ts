@@ -1,8 +1,6 @@
 import { expect, test } from "bun:test";
 import createTypeTree from "../src/create-type-tree";
 
-import { Project } from "ts-morph";
-
 test("handle primitives", () => {
   const sourceCode = `
     type S = string;
@@ -128,7 +126,6 @@ test("handle complex object", () => {
   });
 });
 test("handle Records", () => {
-  const project = new Project();
   const sourceCode = `
       type MyRecord = Record<string, number>;
 `;
@@ -136,7 +133,7 @@ test("handle Records", () => {
   expect(result).toStrictEqual({ MyRecord: "Record<string, number>" });
 });
 
-test("handle simple unions", () => {
+test("handle simple union", () => {
   const sourceCode = `
       type Union = string | number;
      
@@ -146,6 +143,36 @@ test("handle simple unions", () => {
 
   expect(result).toStrictEqual({
     Union: ["string", "number"],
+  });
+});
+
+test("handle simple intesection", () => {
+  const sourceCode = `
+      type Intersection = {a: 'hola'} & {b: 'chao'};
+     
+    `;
+
+  const result = createTypeTree("temp.ts", sourceCode);
+
+  expect(result).toStrictEqual({
+    Intersection: [{ a: '"hola"' }, { b: '"chao"' }],
+  });
+});
+
+test("handle simple intesection and simple union", () => {
+  const sourceCode = `
+      type IntersectionAndUnion = {a: 'hola'} & {b: 'chao'} | {c: 'hello', d: 'bye'};
+     
+    `;
+
+  const result = createTypeTree("temp.ts", sourceCode);
+
+  expect(result).toStrictEqual({
+    IntersectionAndUnion: [
+      [{ a: '"hola"' }, { b: '"chao"' }],
+
+      { c: '"hello"', d: '"bye"' },
+    ],
   });
 });
 

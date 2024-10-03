@@ -75,6 +75,10 @@ function handleNotPrimitive(t?: Type) {
   if (t.isUnion()) {
     return handleUnion(t);
   }
+
+  if (t.isIntersection()) {
+    return handleIntersection(t);
+  }
 }
 
 function handleArray(t?: Type): string | unknown[] {
@@ -135,6 +139,11 @@ function handleTuple(t?: Type) {
 }
 
 function handleUnion(t?: Type): unknown[] | undefined {
-  console.log("Union", t?.getApparentType().getText());
+  console.log("Union");
   return t?.getUnionTypes().map(handleTypes);
+}
+
+function handleIntersection(t?: Type): unknown[] | undefined {
+  console.log("Intersection");
+  return t?.getIntersectionTypes().map(handleTypes);
 }
