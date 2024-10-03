@@ -134,3 +134,53 @@ test("handle Records", () => {
   const result = createTypeTree("temp.ts", sourceCode);
   expect(result).toStrictEqual({ MyRecord: "Record<string, number>" });
 });
+
+test("handle simple unions", () => {
+  const sourceCode = `
+      type Union = string | number;
+     
+    `;
+
+  const result = createTypeTree("temp.ts", sourceCode);
+
+  expect(result).toStrictEqual({
+    Union: ["string", "number"],
+  });
+});
+
+test("handle types from internal and external dependencies", () => {
+  const result = createTypeTree("./__test/ts-to-compile.ts");
+
+  expect(result).toStrictEqual({
+    Stringo: "string",
+    Arr: [
+      {
+        a: '"hol"',
+        b: {
+          a: '"hol"',
+          b: '"chao"',
+        },
+      },
+    ],
+    LiteralArr: [1, 2, '"hello"'],
+    LiteralComplexArr: [1, 2],
+    OtherArr: "string[]",
+    num: "number",
+    literalNumber: 14,
+    AnotherType: {
+      a: '"hol"',
+      b: '"chao"',
+    },
+    Bool: "boolean",
+    Topo: '"topo"',
+    Recordo: "Record<string, OtherType>",
+    OtherType: {
+      a: '"hol"',
+      b: {
+        a: '"hol"',
+        b: '"chao"',
+      },
+    },
+    TypeFromExternalDependency: '"This is type coming from an external file"',
+  });
+});

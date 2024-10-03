@@ -1,3 +1,5 @@
+import { type ExternalTypeDependency } from "./type-dependency";
+
 type Stringo = string;
 type Arr = OtherType[];
 type LiteralArr = [1, 2, "hello"];
@@ -13,3 +15,5 @@ type Topo = "topo";
 type Recordo = Record<string, OtherType>;
 
 type OtherType = { a: "hol"; b: AnotherType };
+
+type TypeFromExternalDependency = ExternalTypeDependency;

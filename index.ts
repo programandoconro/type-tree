@@ -1,6 +1,6 @@
 import { Project, Type } from "ts-morph";
 
-const FILE_PATH = "./ts-to-compile.ts"; // TODO: handle input file
+const FILE_PATH = "./__test/ts-to-compile.ts"; // TODO: handle input file
 createTypeTree(FILE_PATH);
 
 type Result = Record<string, unknown>;
@@ -16,7 +16,7 @@ export function createTypeTree(filePath: string, testCode?: string): Result {
     (typeAlias) => {
       const name = typeAlias.getName();
       result[name] = handleTypes(typeAlias.getType());
-    }
+    },
   );
 
   // console.log({ result, resultStringify: JSON.stringify(result) });
@@ -57,27 +57,24 @@ function handleNotPrimitive(t?: Type) {
 
   if (t.isTuple()) {
     console.log("Tuple");
-    const tuple: unknown[] = [];
-    t.getTupleElements().map((ele) => {
-      if (isPrimitive(ele)) {
-        tuple.push(handlePrimitive(ele));
-      } else {
-        return handleNotPrimitive(ele);
-      }
-    });
-    return tuple;
+    return handleTuple(t);
   }
 
   if (t.isArray()) {
     return handleArray(t);
   }
+
   if (t.isObject()) {
     const record = handleRecord(t);
-
     if (record.isRecord) {
       return record.record;
     }
+
     return handleObject(t);
+  }
+
+  if (t.isUnion()) {
+    return handleUnion(t);
   }
 }
 
@@ -85,7 +82,7 @@ function handleArray(t?: Type): string | unknown[] {
   console.log("Array");
   const arrayType = t?.getArrayElementType();
   const innerText = arrayType?.getText();
-  console.log({ innerText });
+
   if (isPrimitive(arrayType)) {
     return innerText + "[]";
   } else {
@@ -123,4 +120,21 @@ function handleObject(t?: Type) {
     });
   });
   return obj;
+}
+
+function handleTuple(t?: Type) {
+  const tuple: unknown[] = [];
+  t?.getTupleElements().map((ele) => {
+    if (isPrimitive(ele)) {
+      tuple.push(handlePrimitive(ele));
+    } else {
+      return handleNotPrimitive(ele);
+    }
+  });
+  return tuple;
+}
+
+function handleUnion(t?: Type): unknown[] | undefined {
+  console.log("Union", t?.getApparentType().getText());
+  return t?.getUnionTypes().map(handleTypes);
 }
