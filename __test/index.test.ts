@@ -1,5 +1,6 @@
 import { expect, test } from "bun:test";
-import { createTypeTree } from "..";
+import createTypeTree from "../src/create-type-tree";
+
 import { Project } from "ts-morph";
 
 test("handle primitives", () => {
@@ -148,7 +149,7 @@ test("handle simple unions", () => {
   });
 });
 
-test("handle types from internal and external dependencies", () => {
+test("handle types from internal and  external dependencies", () => {
   const result = createTypeTree("./__test/ts-to-compile.ts");
 
   expect(result).toStrictEqual({

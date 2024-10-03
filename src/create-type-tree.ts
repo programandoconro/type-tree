@@ -1,10 +1,10 @@
 import { Project, Type } from "ts-morph";
 
-const FILE_PATH = "./__test/ts-to-compile.ts"; // TODO: handle input file
-createTypeTree(FILE_PATH);
-
 type Result = Record<string, unknown>;
-export function createTypeTree(filePath: string, testCode?: string): Result {
+export default function createTypeTree(
+  filePath: string,
+  testCode?: string,
+): Result {
   const result: Result = {};
   const project = new Project({});
   const sourceFile = !testCode
@@ -56,7 +56,6 @@ function handleNotPrimitive(t?: Type) {
   }
 
   if (t.isTuple()) {
-    console.log("Tuple");
     return handleTuple(t);
   }
 
@@ -123,6 +122,7 @@ function handleObject(t?: Type) {
 }
 
 function handleTuple(t?: Type) {
+  console.log("Tuple");
   const tuple: unknown[] = [];
   t?.getTupleElements().map((ele) => {
     if (isPrimitive(ele)) {
