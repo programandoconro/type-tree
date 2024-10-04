@@ -1,4 +1,5 @@
 import { Project, Type } from "ts-morph";
+import { isQuestionToken } from "typescript";
 
 type Result = Record<string, unknown>;
 export default function createTypeTree(
@@ -113,7 +114,7 @@ function handleObject(t?: Type) {
 
   const obj: Record<string, unknown> = {};
   t?.getProperties().forEach((prop) => {
-    const name = prop?.getName();
+    const name = prop?.isOptional() ? prop?.getName() + "?" : prop?.getName();
     const innerDeclaration = prop.getDeclarations();
     innerDeclaration.forEach((p) => {
       const innerType = p.getType();

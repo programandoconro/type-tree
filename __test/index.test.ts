@@ -176,6 +176,21 @@ test("handle simple intesection and simple union", () => {
   });
 });
 
+test("handle optional props", () => {
+  const sourceCode = `
+      type Obj = { a?: "hello"; b: 123 };
+      interface Obj2 { a?: "hola"; b: true };
+     
+    `;
+
+  const result = createTypeTree("temp.ts", sourceCode);
+
+  expect(result).toStrictEqual({
+    Obj: { "a?": '"hello"', b: 123 },
+    Obj2: { "a?": '"hola"', b: true },
+  });
+});
+
 test("handle types from internal and  external dependencies", () => {
   const result = createTypeTree("./__test/ts-to-compile.ts");
 
