@@ -9,6 +9,7 @@ export default function createTypeTree(
   const result: Result = {};
   const project = new Project({
     tsConfigFilePath: configFile,
+    skipAddingFilesFromTsConfig: true,
   });
   const sourceFile = !testCode
     ? project.addSourceFileAtPath(filePath)
