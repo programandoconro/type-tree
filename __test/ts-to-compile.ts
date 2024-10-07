@@ -1,4 +1,4 @@
-import { type ExternalTypeDependency } from "./type-dependency";
+import { type ExternalTypeDependency, type IdType } from "./type-dependency";
 
 type Stringo = string;
 type Arr = OtherType[];
@@ -17,3 +17,9 @@ type Recordo = Record<string, OtherType>;
 type OtherType = { a: "hol"; b: AnotherType };
 
 type TypeFromExternalDependency = ExternalTypeDependency;
+
+type AnotherNestedExternalDependency = {
+  selectedState?: {
+    id: IdType[];
+  };
+};

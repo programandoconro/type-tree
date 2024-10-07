@@ -1,12 +1,12 @@
-import { getFilePath } from "../utils/get-file-path";
+import { getArgs } from "../utils/get-args";
 import createTypeTree from "./create-type-tree";
 
 const PORT = process.env.PORT ?? 3001;
-const FILE_PATH = getFilePath();
+const { target, config } = getArgs();
 
-const typeTree = FILE_PATH
-  ? createTypeTree(FILE_PATH)
-  : "Please add a file path using --path when starting the server";
+const typeTree = target
+  ? createTypeTree(target, undefined, config)
+  : "Please add --target with your target file path and --config with your ts-config file path when starting the server";
 
 Bun.serve({
   port: PORT,

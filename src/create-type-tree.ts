@@ -4,9 +4,12 @@ type Result = Record<string, unknown>;
 export default function createTypeTree(
   filePath: string,
   testCode?: string,
+  configFile?: string,
 ): Result {
   const result: Result = {};
-  const project = new Project({});
+  const project = new Project({
+    tsConfigFilePath: configFile,
+  });
   const sourceFile = !testCode
     ? project.addSourceFileAtPath(filePath)
     : project.createSourceFile(filePath, testCode);
@@ -54,6 +57,9 @@ function handleNotPrimitive(t?: Type) {
   if (typeof t === "undefined") {
     return undefined;
   }
+  if (t?.isAny()) {
+    return t?.getText();
+  }
 
   if (t.isTuple()) {
     return handleTuple(t);
@@ -74,12 +80,15 @@ function handleNotPrimitive(t?: Type) {
   if (t.isIntersection()) {
     return handleIntersection(t);
   }
+
+  return "Type not handled";
 }
 
 function handleArray(t?: Type): string | unknown[] {
-  console.log("Array");
+  console.log("Array", t?.getText());
   const arrayType = t?.getArrayElementType();
   const innerText = arrayType?.getText();
+  console.log({ innerText }, arrayType?.isAny());
 
   if (isPrimitive(arrayType)) {
     return innerText + "[]";

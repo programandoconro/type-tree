@@ -26,7 +26,7 @@ test("handle primitives", () => {
     B: "boolean",
     T: true,
     F: false,
-    U: undefined,
+    U: "Type not handled",
   });
 });
 
@@ -217,6 +217,11 @@ test("handle types from internal and  external dependencies", () => {
     Bool: "boolean",
     Topo: '"topo"',
     Recordo: "Record<string, OtherType>",
+    AnotherNestedExternalDependency: {
+      "selectedState?": {
+        id: "string[]",
+      },
+    },
     OtherType: {
       a: '"hol"',
       b: {

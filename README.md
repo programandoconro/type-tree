@@ -18,16 +18,16 @@ bun install
 ### Run
 
 ```bash
-bun run start --path PATH_TO_YOUR_TARGET_TS_FILE
+bun run start --target PATH_TO_YOUR_TARGET_TS_FILE --config PATH_TO_YOUR_TSCONFIG_FILE
 ```
 
-Where `--path` is the absolute path to the file you want to examine
-
-You can also use relative path like this `bun run ~/$PATH_TO_THIS_REPO/src/index.ts --path RELATIVE_PATH_TO_YOUR_TARGET_TS_FILE`
+Where `--target` is the absolute path to the file you want to examine and `--config` is the absolute path to your project's tsconfig.json file
 
 ### View type tree
 
-Go to http://localhost:3000 to see the extracted types served as a plain tree.
+Go to http://localhost:3001 to see the extracted types served as a plain tree.
+
+You can also set `PORT` env variable to use different port.
 
 You can use [JSON Formatter](https://chromewebstore.google.com/detail/json-formatter/bcjindcccaagfpapjjmafapmmgkkhgoa?hl=en) browser extension for better visualization experience.
 
