@@ -8,6 +8,8 @@ const typeTree = target
   ? createTypeTree(target, undefined, config)
   : "Please add --target with your target file path and --config with your ts-config file path when starting the server";
 
+console.log(`Ready: Serving on port ${PORT}`);
+
 Bun.serve({
   port: PORT,
   fetch(_req) {

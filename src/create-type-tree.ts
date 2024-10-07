@@ -14,7 +14,6 @@ export default function createTypeTree(
   const sourceFile = !testCode
     ? project.addSourceFileAtPath(filePath)
     : project.createSourceFile(filePath, testCode);
-  //console.log(sourceFile.getText());
 
   [...sourceFile?.getInterfaces(), ...sourceFile?.getTypeAliases()].forEach(
     (typeAlias) => {
@@ -86,10 +85,8 @@ function handleNotPrimitive(t?: Type) {
 }
 
 function handleArray(t?: Type): string | unknown[] {
-  console.log("Array", t?.getText());
   const arrayType = t?.getArrayElementType();
   const innerText = arrayType?.getText();
-  console.log({ innerText }, arrayType?.isAny());
 
   if (isPrimitive(arrayType)) {
     return innerText + "[]";
@@ -118,8 +115,6 @@ function handleRecord(t?: Type) {
 }
 
 function handleObject(t?: Type) {
-  console.log("Object");
-
   const record = handleRecord(t);
   if (record.isRecord) {
     return record.record;
@@ -140,7 +135,6 @@ function handleObject(t?: Type) {
 }
 
 function handleTuple(t?: Type) {
-  console.log("Tuple");
   const tuple: unknown[] = [];
   t?.getTupleElements().map((ele) => {
     if (isPrimitive(ele)) {
@@ -153,11 +147,9 @@ function handleTuple(t?: Type) {
 }
 
 function handleUnion(t?: Type): unknown[] | undefined {
-  console.log("Union");
   return t?.getUnionTypes().map(handleTypes);
 }
 
 function handleIntersection(t?: Type): unknown[] | undefined {
-  console.log("Intersection");
   return t?.getIntersectionTypes().map(handleTypes);
 }
