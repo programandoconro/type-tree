@@ -1,5 +1,4 @@
 import { Project, Type } from "ts-morph";
-import { isQuestionToken } from "typescript";
 
 type Result = Record<string, unknown>;
 export default function createTypeTree(
@@ -65,11 +64,6 @@ function handleNotPrimitive(t?: Type) {
   }
 
   if (t.isObject()) {
-    const record = handleRecord(t);
-    if (record.isRecord) {
-      return record.record;
-    }
-
     return handleObject(t);
   }
 
@@ -94,23 +88,32 @@ function handleArray(t?: Type): string | unknown[] {
   }
 }
 
-function handleRecord(t: Type) {
-  console.log("Record");
-  const symbolDeclarations = t.getAliasSymbol()?.getDeclarations();
-  const record = symbolDeclarations?.[0]
+function handleRecord(t?: Type) {
+  const symbolDeclarations = t?.getAliasSymbol()?.getDeclarations();
+  const externalRecord = symbolDeclarations?.[0]
     ?.getText()
     .split("=")?.[1]
     ?.replace(" ", "")
     ?.replace(";", "");
+  const internalRecord = t?.getText();
+
+  const isExternalRecord = externalRecord?.startsWith("Record");
+  const isInternalRecord = internalRecord?.startsWith("Record");
+  const record = isExternalRecord ? externalRecord : internalRecord;
 
   return {
-    isRecord: symbolDeclarations?.length === 1 && record?.includes("Record<"),
+    isRecord: isInternalRecord || isExternalRecord,
     record,
   };
 }
 
 function handleObject(t?: Type) {
   console.log("Object");
+
+  const record = handleRecord(t);
+  if (record.isRecord) {
+    return record.record;
+  }
 
   const obj: Record<string, unknown> = {};
   t?.getProperties().forEach((prop) => {

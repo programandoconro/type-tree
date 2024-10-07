@@ -3,7 +3,7 @@
   "module": "index.ts",
   "type": "module",
   "scripts": {
-    "start": "bun run src/index.ts",
+    "start": "bun --watch src/index.ts",
     "dev": "bun --watch src/index.ts",
     "prettier": "npx prettier . --write",
     "test": "bun --watch test __test/index.test.ts"
