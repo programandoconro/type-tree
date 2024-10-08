@@ -39,6 +39,11 @@ function isPrimitive(t?: Type): boolean {
   return Boolean(isNumber || isString || isBoolean || isNullish);
 }
 
+function isPartialRecord(t?: Type) {
+  const name = t?.getAliasSymbol()?.getName();
+  return name?.includes("Partial") && name?.includes("Record");
+}
+
 function handlePrimitive(t?: Type) {
   switch (true) {
     case t?.isNumberLiteral(): {
@@ -57,7 +62,7 @@ function handleNotPrimitive(t?: Type) {
   if (typeof t === "undefined") {
     return undefined;
   }
-  if (t?.isAny()) {
+  if (t?.isAny() || isPartialRecord(t)) {
     return t?.getText();
   }
 
