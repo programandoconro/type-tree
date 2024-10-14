@@ -4,9 +4,8 @@ type Result = Record<string, unknown>;
 export default function createTypeTree(
   filePath: string,
   testCode?: string,
-  configFile?: string,
+  configFile?: string
 ): Result {
-  const result: Result = {};
   const project = new Project({
     tsConfigFilePath: configFile,
     skipAddingFilesFromTsConfig: true,
@@ -15,14 +14,15 @@ export default function createTypeTree(
     ? project.addSourceFileAtPath(filePath)
     : project.createSourceFile(filePath, testCode);
 
-  [...sourceFile?.getInterfaces(), ...sourceFile?.getTypeAliases()].forEach(
-    (typeAlias) => {
-      const name = typeAlias.getName();
-      result[name] = handleTypes(typeAlias.getType());
-    },
-  );
+  const result = [
+    ...sourceFile?.getInterfaces(),
+    ...sourceFile?.getTypeAliases(),
+  ].reduce((acc, current) => {
+    const name = current.getName();
+    acc[name] = handleTypes(current.getType());
+    return acc;
+  }, {} as Result);
 
-  // console.log({ result, resultStringify: JSON.stringify(result) });
   return result;
 }
 
@@ -131,9 +131,7 @@ function handleObject(t?: Type) {
     const innerDeclaration = prop.getDeclarations();
     innerDeclaration.forEach((p) => {
       const innerType = p.getType();
-      obj[name] = isPrimitive(innerType)
-        ? handlePrimitive(innerType)
-        : handleNotPrimitive(innerType);
+      obj[name] = handleTypes(innerType);
     });
   });
   return obj;
