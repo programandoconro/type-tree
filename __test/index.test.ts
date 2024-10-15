@@ -1,5 +1,5 @@
 import { expect, test } from "bun:test";
-import createTypeTree from "../src/create-type-tree";
+import createTypeTree from "../ext/src/create-type-tree";
 
 test("handle primitives", () => {
   const sourceCode = `

@@ -2,7 +2,15 @@
 
 Takes a ts file path and serves json with plain extracted types and interfaces. It facilitates the visualization of nested types, specially when types are imported from different files. You can see it as a type tree creator for your types.
 
+You can use it in the browser or as a VScode extension
+
 ## How to use it:
+
+### As a VScode extension
+
+Go to this [ext folder](./ext/README.md) for details
+
+### In the browser
 
 This project was created using bun [Bun](https://bun.sh), and [ts-morph](https://ts-morph.com/).
 Follow the next steps to run it locally.
