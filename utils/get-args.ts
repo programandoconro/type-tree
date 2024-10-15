@@ -14,8 +14,9 @@ export function getArgs(): Args {
 
   if (!values?.config) {
     console.error(
-      "There is no config file, please add --config with the path to ts config target file",
+      "Using root directory tsconfig.json file because you did not specify add --config with the path to ts config file",
     );
+    values.config = "tsconfig.json";
   }
 
   return values;

@@ -21,15 +21,17 @@ Note: You can use `npx bun` if you do not want to install bun.
 
 ```bash
 bun install
+// or npx bun install
 ```
 
 ### Run
 
 ```bash
 bun run start --config PATH_TO_YOUR_TSCONFIG_FILE
+// or npx bun run start --config PATH_TO_YOUR_TSCONFIG_FILE
 ```
 
-Where `--config` should have the path to your project's tsconfig.json file.
+Where `--config` should have the path to your project's tsconfig.json file. This will default to the root directory `tsconfig.json` file if `--config` is not provided.
 
 ### View type tree
 
