@@ -8,7 +8,7 @@ You can use it in the browser or as a VScode extension
 
 ### As a VScode extension
 
-Go to this [ext folder](./ext/README.md) for details
+Go to this [./ext/README.md](./ext/README.md) for details
 
 ### In the browser
 

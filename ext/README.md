@@ -19,9 +19,10 @@ Vscode
 
 1. Download/clone this repository.
 2. Open extensions in Vscode and click install from VSIX.
-3. Add the `.vsix` file that you will find in this repository.
 
 ![How to install this extension](./pics/how-to-install.png)
+
+3. Add the `.vsix` file that you will find [here](./type-tree-0.0.1.vsix).
 
 ## How to use
 
