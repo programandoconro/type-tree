@@ -1,4 +1,8 @@
-import { type ExternalTypeDependency, type IdType } from "./type-dependency";
+import {
+  ErrorEnum,
+  type ExternalTypeDependency,
+  type IdType,
+} from "./type-dependency";
 
 type Stringo = string;
 type Arr = OtherType[];
@@ -22,4 +26,5 @@ type AnotherNestedExternalDependency = {
   selectedState?: {
     id: IdType[];
   };
+  error: ErrorEnum;
 };

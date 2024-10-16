@@ -6,14 +6,6 @@ You can use it in the browser or as a VScode extension.
 
 ## How to use it:
 
-### As a VScode extension
-
-![extension](./pics/type-tree-ext.png)
-
-Go to this [./ext/README.md](./ext/README.md) for details on how to use it as a VScode extension.
-
-### In the browser
-
 ![browser app](./pics/type-tree-json.png)
 
 This project was created using bun [Bun](https://bun.sh), and [ts-morph](https://ts-morph.com/).

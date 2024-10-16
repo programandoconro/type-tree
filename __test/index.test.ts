@@ -1,6 +1,29 @@
 import { expect, test } from "bun:test";
-import createTypeTree from "../ext/src/create-type-tree";
+import createTypeTree from "../src/create-type-tree";
 
+test("handle enum", () => {
+  const sourceCode = `
+    enum Direction {
+      Up = "UP",
+      Down = "DOWN",
+      Left = "LEFT",
+      Right = "RIGHT",
+    }
+
+    const enum Error {
+      Un = 'un',
+      In = 'in',
+    }
+     
+    `;
+
+  const result = createTypeTree("temp.ts", sourceCode);
+
+  expect(result).toStrictEqual({
+    Direction: ["Up", "Down", "Left", "Right"],
+    Error: ["Un", "In"],
+  });
+});
 test("handle primitives", () => {
   const sourceCode = `
     type S = string;
@@ -146,7 +169,7 @@ test("handle simple union", () => {
   });
 });
 
-test("handle simple intesection", () => {
+test("handle simple intersection", () => {
   const sourceCode = `
       type Intersection = {a: 'hola'} & {b: 'chao'};
      
@@ -159,7 +182,7 @@ test("handle simple intesection", () => {
   });
 });
 
-test("handle simple intesection and simple union", () => {
+test("handle simple intersection and simple union", () => {
   const sourceCode = `
       type IntersectionAndUnion = {a: 'hola'} & {b: 'chao'} | {c: 'hello', d: 'bye'};
      
@@ -221,7 +244,9 @@ test("handle types from internal and  external dependencies", () => {
       "selectedState?": {
         id: "string[]",
       },
+      error: ["Un", "In"],
     },
+
     OtherType: {
       a: '"hol"',
       b: {

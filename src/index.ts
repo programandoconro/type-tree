@@ -1,5 +1,5 @@
 import { getArgs } from "../utils/get-args";
-import createTypeTree from "../ext/src/create-type-tree";
+import createTypeTree from "./create-type-tree";
 
 const PORT = process.env.PORT ?? 3001;
 const { config } = getArgs();
