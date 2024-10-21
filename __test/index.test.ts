@@ -49,7 +49,7 @@ test("handle primitives", () => {
     B: "boolean",
     T: true,
     F: false,
-    U: "Type not handled",
+    U: "undefined (Type not handled)",
   });
 });
 
@@ -255,5 +255,19 @@ test("handle types from internal and  external dependencies", () => {
       },
     },
     TypeFromExternalDependency: '"This is type coming from an external file"',
+  });
+});
+
+test("handle constant type", () => {
+  const sourceCode = `
+      type Obj = { a?: "hello"; b: typeof B};
+      const B = {b: "bye"} as const
+     
+    `;
+
+  const result = createTypeTree("temp.ts", sourceCode);
+
+  expect(result).toStrictEqual({
+    Obj: { "a?": '"hello"', b: { b: '"bye"' } },
   });
 });

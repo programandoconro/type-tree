@@ -4,7 +4,7 @@ type Result = Record<string, unknown>;
 export default function createTypeTree(
   filePath: string,
   testCode?: string,
-  configFile?: string
+  configFile?: string,
 ): Result {
   const project = new Project({
     tsConfigFilePath: configFile,
@@ -88,7 +88,7 @@ function handleNotPrimitive(t?: Type) {
     return handleIntersection(t);
   }
 
-  return "Type not handled";
+  return t?.getText() + " (Type not handled)";
 }
 
 function handleArray(t?: Type): string | unknown[] {
