@@ -4,7 +4,7 @@ export function getArgs(): Args {
   const { values } = parseArgs({
     args: Bun.argv,
     options: {
-      config: {
+      root: {
         type: "string",
       },
     },
@@ -12,15 +12,15 @@ export function getArgs(): Args {
     allowPositionals: true,
   });
 
-  if (!values?.config) {
+  if (!values?.root) {
     console.error(
       "Using root directory tsconfig.json file because you did not specify add --config with the path to ts config file",
     );
-    values.config = "tsconfig.json";
+    values.root = "./";
   }
 
   return values;
 }
 type Args = {
-  config?: string;
+  root?: string;
 };

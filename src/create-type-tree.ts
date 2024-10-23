@@ -1,4 +1,5 @@
 import { Project, Type } from "ts-morph";
+console.log("RUNNING TYPE TREE");
 
 type Result = Record<string, unknown>;
 export default function createTypeTree(

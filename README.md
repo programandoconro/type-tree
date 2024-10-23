@@ -1,14 +1,12 @@
 # Type-Tree
 
-Takes a ts file path and serves json with plain extracted types and interfaces. It facilitates the visualization of nested types, specially when types are imported from different files. You can see it as a type tree creator for your types.
-
-You can use it in the browser or as a VScode extension.
+> Takes the root path of your ts project and serves `json` file with extracted types and interfaces from ts files. It facilitates the visualization of nested types, specially when types are imported from different files. You can see it as a type tree creator for your types.
 
 ## How to use it:
 
 ![browser app](./pics/type-tree-json.png)
 
-This project was created using bun [Bun](https://bun.sh), and [ts-morph](https://ts-morph.com/).
+This project was created using [Bun](https://bun.sh), and [ts-morph](https://ts-morph.com/).
 Follow the next steps to run it locally.
 
 ### Install dependencies:
@@ -23,21 +21,19 @@ bun install
 ### Run
 
 ```bash
-bun run start --config PATH_TO_YOUR_TSCONFIG_FILE
-// or npx bun run start --config PATH_TO_YOUR_TSCONFIG_FILE
+bun run start --root PATH_TO_THE_ROOT_OF_YOUR_TS_PROJECT
+// or npx bun run start --root PATH_TO_THE_ROOT_OF_YOUR_TS_PROJECT
 ```
 
-Where `--config` should have the path to your project's tsconfig.json file. This will default to the root directory `tsconfig.json` file if `--config` is not provided.
+Where `--root` should have the root path to your project. This necessary to find the `tsconfig.json` file, required for the program to properly work. This will default `./` if not provided.
 
 ### View type tree
 
-Go to http://localhost:3001/?path=PATH_TO_YOUR_TARGET_TS_FILE to see the extracted types served as a plain tree.
-
-Please add a `?path=` [query string](https://en.wikipedia.org/wiki/Query_string) with your target ts file to analyze.
+Go to http://localhost:3001 to see the root of your project directory, then navigate to the ts file that you want to extract types from. It will create a type tree in json format.
 
 Note: You can also set a different `PORT` env variable if 3001 is not available.
 
-I recommend using a json viewer browser extension for better visualization. For example, [JSON Formatter](https://chromewebstore.google.com/detail/json-formatter/bcjindcccaagfpapjjmafapmmgkkhgoa?hl=en) works well for me.
+It is required to use a json viewer browser extension for better visualization. For example, [JSON Formatter](https://chromewebstore.google.com/detail/json-formatter/bcjindcccaagfpapjjmafapmmgkkhgoa?hl=en) works well for me.
 
 ### Contributions
 

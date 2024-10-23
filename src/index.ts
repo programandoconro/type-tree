@@ -1,26 +1,57 @@
 import { getArgs } from "../utils/get-args";
 import createTypeTree from "./create-type-tree";
+import { readdirSync, statSync } from "fs";
+import { join } from "path";
 
 const PORT = process.env.PORT ?? 3001;
-const { config } = getArgs();
+const { root } = getArgs();
+const basePath = root?.endsWith("/") ? root : root + "/";
+console.log("The root of you project is" + basePath + "\n");
 
-const typeTree = (target?: string) =>
-  target
-    ? createTypeTree(target, undefined, config)
-    : "Please add `?path=` in url with your target file path.";
+const tsconfig = basePath + "tsconfig.json";
+console.log(`Config file is ${tsconfig} \n`);
 
-console.log(`Ready: Serving on port ${PORT}`);
-
+console.log(`Ready: Serving on http://localhost:${PORT} \n`);
 Bun.serve({
   port: PORT,
   fetch(req) {
-    const searchParams = new URLSearchParams(req.url);
-    let path = "";
-    for (const [key, value] of searchParams) {
-      if (key.includes("path")) {
-        path = value;
+    const url = new URL(req.url);
+    const requestedPath = join(basePath, url.pathname);
+
+    try {
+      const stats = statSync(requestedPath);
+
+      if (stats.isDirectory()) {
+        const files = readdirSync(requestedPath);
+        const fileList = files
+          .map((file) => {
+            const filePath = join(url.pathname, file);
+            const isDir = statSync(join(requestedPath, file)).isDirectory();
+            return `<li><a href="${filePath}">${file}${isDir ? "/" : ""}</a></li>`;
+          })
+          .join("");
+
+        const html = `<html><body><h1>Index of ${url.pathname}</h1><ul>${fileList}</ul></body></html>`;
+        return new Response(html, {
+          headers: { "Content-Type": "text/html" },
+        });
+      } else {
+        if (requestedPath.endsWith(".ts") || requestedPath.endsWith(".tsx")) {
+          console.log(
+            `Analizing ${requestedPath}.\n\nPlease wait 5 seconds ...  \n`,
+          );
+          const typeTree = JSON.stringify(
+            createTypeTree(requestedPath, "", tsconfig),
+          );
+          console.log("DONE!!\n");
+          return new Response(typeTree);
+        }
+        // If the path is not a ts/tsx file, return the file contents
+        return new Response(Bun.file(requestedPath));
       }
+    } catch (error) {
+      console.error(error);
+      return new Response("There was an error " + error, { status: 500 });
     }
-    return new Response(JSON.stringify(typeTree(path)));
   },
 });
