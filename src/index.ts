@@ -11,10 +11,10 @@ console.log("The root of you project is" + basePath + "\n");
 const tsconfig = basePath + "tsconfig.json";
 console.log(`Config file is ${tsconfig} \n`);
 
+console.log(`Ready: Serving on http://localhost:${PORT} \n`);
 Bun.serve({
   port: PORT,
   fetch(req) {
-    console.log(`Ready: Serving on http://localhost:${PORT} \n`);
     const url = new URL(req.url);
     const requestedPath = join(basePath, url.pathname);
 
